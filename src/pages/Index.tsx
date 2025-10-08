@@ -15,7 +15,7 @@ const Index = () => {
 
   useEffect(() => {
     spinAudioRef.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGnePyvmwhBSyBzvLXiTcIGWi77eefTRAMUKfj8LZjHAY4ktfyzHksBSR3x/DdkEAKFF606+uoVRQKRp3j8r5sIQUsgs');
-    winAudioRef.current = new Audio('data:audio/wav;base64,UklGRhIAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YU4AAAAAAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAA==');
+    winAudioRef.current = new Audio('https://actions.google.com/sounds/v1/alarms/bugle_tune.ogg');
   }, []);
 
   const handleSpin = () => {
@@ -40,6 +40,13 @@ const Index = () => {
     setTimeout(() => {
       let selectedWinner;
       
+      const excludedNames = [
+        'голубкова юлиана',
+        'нечаева аксинья',
+        'кулешова арина',
+        'яргунов роман'
+      ];
+      
       const specialNames = [
         'щеколдин артём',
         'щеколдин артем',
@@ -50,21 +57,28 @@ const Index = () => {
         'сверчкова олеся'
       ];
       
-      const specialParticipants = list.filter(p => {
+      const eligibleList = list.filter(p => {
+        const nameLower = p.toLowerCase();
+        return !excludedNames.some(excluded => nameLower.includes(excluded));
+      });
+      
+      const specialParticipants = eligibleList.filter(p => {
         const nameLower = p.toLowerCase();
         return specialNames.some(special => nameLower.includes(special));
       });
       
-      const hasShchekoldin = list.some(p => p.toLowerCase().includes('щеколдин артём') || p.toLowerCase().includes('щеколдин артем'));
-      const hasTuzov = list.some(p => p.toLowerCase().includes('тузов сергей'));
-      const hasZagulyaev = list.some(p => p.toLowerCase().includes('загуляев семён') || p.toLowerCase().includes('загуляев семен'));
-      const hasMilovanov = list.some(p => p.toLowerCase().includes('милованов андрей'));
-      const hasSverchkova = list.some(p => p.toLowerCase().includes('сверчкова олеся'));
+      const hasShchekoldin = eligibleList.some(p => p.toLowerCase().includes('щеколдин артём') || p.toLowerCase().includes('щеколдин артем'));
+      const hasTuzov = eligibleList.some(p => p.toLowerCase().includes('тузов сергей'));
+      const hasZagulyaev = eligibleList.some(p => p.toLowerCase().includes('загуляев семён') || p.toLowerCase().includes('загуляев семен'));
+      const hasMilovanov = eligibleList.some(p => p.toLowerCase().includes('милованов андрей'));
+      const hasSverchkova = eligibleList.some(p => p.toLowerCase().includes('сверчкова олеся'));
       
       const allSpecialPresent = hasShchekoldin && hasTuzov && hasZagulyaev && hasMilovanov && hasSverchkova;
       
       if (allSpecialPresent && specialParticipants.length > 0) {
         selectedWinner = specialParticipants[Math.floor(Math.random() * specialParticipants.length)];
+      } else if (eligibleList.length > 0) {
+        selectedWinner = eligibleList[Math.floor(Math.random() * eligibleList.length)];
       } else {
         selectedWinner = list[Math.floor(Math.random() * list.length)];
       }
@@ -73,7 +87,7 @@ const Index = () => {
       setIsSpinning(false);
       
       if (winAudioRef.current) {
-        winAudioRef.current.volume = 0.4;
+        winAudioRef.current.volume = 0.5;
         winAudioRef.current.play().catch(() => {});
       }
       
