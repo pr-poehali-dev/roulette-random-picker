@@ -193,14 +193,22 @@ const Index = () => {
                 ref={wheelRef}
                 className={`w-full h-full rounded-full border-8 border-primary/50 relative ${isSpinning ? 'animate-spin-wheel' : ''}`}
                 style={{
-                  boxShadow: '0 0 30px rgba(139, 92, 246, 0.4), 0 0 50px rgba(139, 92, 246, 0.2), inset 0 0 30px rgba(139, 92, 246, 0.15)',
-                  background: 'radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, rgba(30, 30, 50, 0.9) 70%)'
+                  boxShadow: isDarkMode 
+                    ? '0 0 30px rgba(139, 92, 246, 0.4), 0 0 50px rgba(139, 92, 246, 0.2), inset 0 0 30px rgba(139, 92, 246, 0.15)'
+                    : '0 0 25px rgba(139, 92, 246, 0.25), 0 0 40px rgba(139, 92, 246, 0.15), inset 0 0 20px rgba(139, 92, 246, 0.1)',
+                  background: isDarkMode
+                    ? 'radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, rgba(30, 30, 50, 0.9) 70%)'
+                    : 'radial-gradient(circle, rgba(200, 195, 220, 0.8) 0%, rgba(220, 215, 235, 0.95) 70%)'
                 }}
               >
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full border-4 border-secondary/50 flex items-center justify-center"
                      style={{
-                       boxShadow: '0 0 15px rgba(94, 147, 177, 0.5)',
-                       background: 'radial-gradient(circle, rgba(94, 147, 177, 0.25) 0%, rgba(30, 30, 50, 0.95) 70%)'
+                       boxShadow: isDarkMode
+                         ? '0 0 15px rgba(94, 147, 177, 0.5)'
+                         : '0 0 12px rgba(139, 92, 246, 0.3)',
+                       background: isDarkMode
+                         ? 'radial-gradient(circle, rgba(94, 147, 177, 0.25) 0%, rgba(30, 30, 50, 0.95) 70%)'
+                         : 'radial-gradient(circle, rgba(210, 205, 230, 0.9) 0%, rgba(225, 220, 240, 0.95) 70%)'
                      }}>
                   <Icon name="Sparkles" size={32} className="text-secondary" />
                 </div>
