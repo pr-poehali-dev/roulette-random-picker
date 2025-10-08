@@ -4,29 +4,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
-import { Input } from '@/components/ui/input';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from '@/components/ui/dialog';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-
-interface SavedList {
-  id: string;
-  name: string;
-  participants: string;
-  createdAt: number;
-}
 
 const Index = () => {
   const [participants, setParticipants] = useState('');
@@ -34,10 +11,6 @@ const Index = () => {
   const [winner, setWinner] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [winnersHistory, setWinnersHistory] = useState<string[]>([]);
-  const [savedLists, setSavedLists] = useState<SavedList[]>([]);
-  const [currentListId, setCurrentListId] = useState<string | null>(null);
-  const [newListName, setNewListName] = useState('');
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const wheelRef = useRef<HTMLDivElement>(null);
   const spinAudioRef = useRef<HTMLAudioElement | null>(null);
   const winAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -46,77 +19,8 @@ const Index = () => {
     spinAudioRef.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGnePyvmwhBSyBzvLXiTcIGWi77eefTRAMUKfj8LZjHAY4ktfyzHksBSR3x/DdkEAKFF606+uoVRQKRp3j8r5sIQUsgs');
     winAudioRef.current = new Audio('https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg');
     
-    const saved = localStorage.getItem('wheelLists');
-    if (saved) {
-      setSavedLists(JSON.parse(saved));
-    }
-    
     document.documentElement.classList.toggle('dark', isDarkMode);
   }, [isDarkMode]);
-
-  useEffect(() => {
-    if (savedLists.length > 0) {
-      localStorage.setItem('wheelLists', JSON.stringify(savedLists));
-    }
-  }, [savedLists]);
-
-  const saveCurrentList = () => {
-    if (!newListName.trim()) {
-      toast.error('Введите название списка');
-      return;
-    }
-
-    if (!participants.trim()) {
-      toast.error('Список участников пуст');
-      return;
-    }
-
-    const newList: SavedList = {
-      id: Date.now().toString(),
-      name: newListName.trim(),
-      participants: participants,
-      createdAt: Date.now()
-    };
-
-    setSavedLists(prev => [...prev, newList]);
-    setCurrentListId(newList.id);
-    setNewListName('');
-    setIsDialogOpen(false);
-    toast.success('Список сохранен!');
-  };
-
-  const loadList = (listId: string) => {
-    const list = savedLists.find(l => l.id === listId);
-    if (list) {
-      setParticipants(list.participants);
-      setCurrentListId(listId);
-      setWinner('');
-      setWinnersHistory([]);
-      toast.success(`Загружен: ${list.name}`);
-    }
-  };
-
-  const deleteList = (listId: string) => {
-    setSavedLists(prev => prev.filter(l => l.id !== listId));
-    if (currentListId === listId) {
-      setCurrentListId(null);
-      setParticipants('');
-      setWinner('');
-      setWinnersHistory([]);
-    }
-    toast.success('Список удален');
-  };
-
-  const updateCurrentList = () => {
-    if (!currentListId) return;
-    
-    setSavedLists(prev => prev.map(list => 
-      list.id === currentListId 
-        ? { ...list, participants: participants }
-        : list
-    ));
-    toast.success('Список обновлен');
-  };
 
   const handleSpin = () => {
     const list = participants
@@ -279,113 +183,20 @@ const Index = () => {
         <div className="grid md:grid-cols-2 gap-8 items-start">
           <Card className="p-6 border-2 border-primary/40 bg-card/80 backdrop-blur-sm"
                 style={{ boxShadow: '0 0 15px rgba(139, 92, 246, 0.2)' }}>
-            <div className="flex items-center justify-between mb-3">
-              <label className="block text-lg font-semibold text-secondary">
-                Список участников
-              </label>
-              
-              <div className="flex gap-2">
-                {savedLists.length > 0 && (
-                  <Select value={currentListId || ''} onValueChange={loadList}>
-                    <SelectTrigger className="w-[200px] bg-background/80 border-secondary/40">
-                      <SelectValue placeholder="Выбрать список" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {savedLists.map(list => (
-                        <SelectItem key={list.id} value={list.id}>
-                          {list.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                )}
-                
-                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="border-secondary/40">
-                      <Icon name="Save" size={16} className="mr-2" />
-                      Сохранить
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Сохранить список</DialogTitle>
-                    </DialogHeader>
-                    <div className="py-4">
-                      <Input
-                        placeholder="Название списка"
-                        value={newListName}
-                        onChange={(e) => setNewListName(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && saveCurrentList()}
-                      />
-                    </div>
-                    <DialogFooter>
-                      <Button onClick={saveCurrentList}>
-                        Сохранить
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </div>
-            
+            <label className="block text-lg font-semibold mb-3 text-secondary">
+              Список участников
+            </label>
             <Textarea
               value={participants}
               onChange={(e) => setParticipants(e.target.value)}
-              placeholder="Введите имена участников (каждый с новой строки)"
+              placeholder="Введите имена участников"
               className="min-h-[300px] bg-background/80 border-secondary/40 focus:border-secondary text-foreground resize-none"
             />
             
-            <div className="mt-4 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Icon name="Users" size={16} className="text-accent" />
-                <span>Участников: {participantList.length}</span>
-              </div>
-              
-              {currentListId && (
-                <div className="flex gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={updateCurrentList}
-                    className="border-secondary/40"
-                  >
-                    <Icon name="RefreshCw" size={14} className="mr-2" />
-                    Обновить
-                  </Button>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => deleteList(currentListId)}
-                    className="border-destructive/40 text-destructive hover:bg-destructive/10"
-                  >
-                    <Icon name="Trash2" size={14} className="mr-2" />
-                    Удалить
-                  </Button>
-                </div>
-              )}
+            <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+              <Icon name="Users" size={16} className="text-accent" />
+              <span>Участников: {participantList.length}</span>
             </div>
-            
-            {savedLists.length > 0 && (
-              <div className="mt-4 pt-4 border-t border-secondary/20">
-                <p className="text-sm font-semibold text-muted-foreground mb-2">Сохраненные списки:</p>
-                <div className="flex flex-wrap gap-2">
-                  {savedLists.map(list => (
-                    <button
-                      key={list.id}
-                      onClick={() => loadList(list.id)}
-                      className={`px-3 py-1 rounded-full text-sm border transition-colors ${
-                        currentListId === list.id 
-                          ? 'bg-secondary/20 border-secondary text-secondary'
-                          : 'bg-background/60 border-secondary/40 text-muted-foreground hover:bg-background'
-                      }`}
-                    >
-                      {list.name}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
           </Card>
 
           <div className="flex flex-col items-center">
