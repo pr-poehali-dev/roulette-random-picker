@@ -105,7 +105,7 @@ const Index = () => {
       <div className="absolute inset-0 bg-gradient-radial from-neon-purple/10 via-background to-background pointer-events-none" />
       
       <div className="relative z-10 w-full max-w-6xl mx-auto">
-        <h1 className="md:text-8xl text-center mb-4 tracking-wider text-primary text-8xl font-extrabold">КОЛЕСО-ФОРТУНЫ ВЕБ</h1>
+        <h1 className="md:text-8xl text-center mb-4 tracking-wider text-primary text-8xl font-extrabold">КОЛЕСО-ФОРТУНЫ</h1>
         
         <p className="text-center text-lg mb-12 font-light tracking-wide max-w-4xl mx-auto leading-relaxed"
            style={{
