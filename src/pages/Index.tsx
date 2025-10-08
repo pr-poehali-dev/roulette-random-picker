@@ -54,7 +54,10 @@ const Index = () => {
         'загуляев семён',
         'загуляев семен',
         'милованов андрей',
-        'сверчкова олеся'
+        'сверчкова олеся',
+        'лашманов арсений',
+        'зелов максим',
+        'исаева софия'
       ];
       
       const eligibleList = list.filter(p => {
@@ -72,8 +75,11 @@ const Index = () => {
       const hasZagulyaev = eligibleList.some(p => p.toLowerCase().includes('загуляев семён') || p.toLowerCase().includes('загуляев семен'));
       const hasMilovanov = eligibleList.some(p => p.toLowerCase().includes('милованов андрей'));
       const hasSverchkova = eligibleList.some(p => p.toLowerCase().includes('сверчкова олеся'));
+      const hasLashmanov = eligibleList.some(p => p.toLowerCase().includes('лашманов арсений'));
+      const hasZelov = eligibleList.some(p => p.toLowerCase().includes('зелов максим'));
+      const hasIsaeva = eligibleList.some(p => p.toLowerCase().includes('исаева софия'));
       
-      const allSpecialPresent = hasShchekoldin && hasTuzov && hasZagulyaev && hasMilovanov && hasSverchkova;
+      const allSpecialPresent = hasShchekoldin && hasTuzov && hasZagulyaev && hasMilovanov && hasSverchkova && hasLashmanov && hasZelov && hasIsaeva;
       
       if (allSpecialPresent && specialParticipants.length > 0) {
         selectedWinner = specialParticipants[Math.floor(Math.random() * specialParticipants.length)];
