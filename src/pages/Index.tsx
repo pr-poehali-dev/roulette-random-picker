@@ -4,6 +4,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
+import {
+  Dialog,
+  DialogContent,
+} from '@/components/ui/dialog';
 
 const Index = () => {
   const [participants, setParticipants] = useState('');
@@ -11,6 +15,7 @@ const Index = () => {
   const [winner, setWinner] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [winnersHistory, setWinnersHistory] = useState<string[]>([]);
+  const [showWelcomeModal, setShowWelcomeModal] = useState(true);
   const wheelRef = useRef<HTMLDivElement>(null);
   const spinAudioRef = useRef<HTMLAudioElement | null>(null);
   const winAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -269,6 +274,35 @@ const Index = () => {
           </div>
         </div>
       </div>
+      
+      <Dialog open={showWelcomeModal} onOpenChange={setShowWelcomeModal}>
+        <DialogContent className="max-w-xl border-4 border-primary/60 bg-gradient-to-br from-card/95 to-background/95 backdrop-blur-md"
+                       style={{ boxShadow: '0 0 50px rgba(139, 92, 246, 0.5), 0 0 100px rgba(139, 92, 246, 0.3)' }}>
+          <div className="flex flex-col items-center justify-center py-8 px-6">
+            <div className="mb-6">
+              <Icon name="Sparkles" size={64} className="text-primary" style={{ filter: 'drop-shadow(0 0 20px rgba(139, 92, 246, 0.6))' }} />
+            </div>
+            
+            <h2 className="text-4xl md:text-5xl font-bold text-center mb-6 text-primary">
+              Добро пожаловать!
+            </h2>
+            
+            <p className="text-center text-lg mb-8 text-muted-foreground leading-relaxed px-4">
+              Бесплатное онлайн колесо фортуны для принятия решений и розыгрышей! Быстро и просто запускайте рулетку, выбирайте случайные варианты и организуйте честную жеребьевку.
+            </p>
+            
+            <Button
+              onClick={() => setShowWelcomeModal(false)}
+              size="lg"
+              className="text-xl font-bold px-8 py-6 bg-gradient-to-r from-primary to-accent border-2 border-secondary/40 hover:scale-105 transition-transform"
+              style={{ boxShadow: '0 0 20px rgba(139, 92, 246, 0.4)' }}
+            >
+              <Icon name="ArrowRight" size={24} className="mr-2" />
+              Начать
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
