@@ -200,119 +200,34 @@ const Index = () => {
           </Card>
 
           <div className="flex flex-col items-center">
-            <div className="relative w-96 h-96 mb-8">
+            <div className="relative w-80 h-80 mb-8">
               <div 
                 ref={wheelRef}
-                className={`w-full h-full rounded-full relative overflow-hidden ${isSpinning ? 'animate-spin-wheel' : ''}`}
+                className={`w-full h-full rounded-full border-8 border-primary/50 relative ${isSpinning ? 'animate-spin-wheel' : ''}`}
                 style={{
                   boxShadow: isDarkMode 
-                    ? '0 0 50px #8B5CF6, 0 0 100px #EC4899, 0 0 150px #06B6D4, inset 0 0 50px rgba(139, 92, 246, 0.3)'
-                    : '0 0 40px rgba(139, 92, 246, 0.6), 0 0 80px rgba(236, 72, 153, 0.4), inset 0 0 30px rgba(139, 92, 246, 0.2)',
-                  border: isDarkMode 
-                    ? '3px solid #8B5CF6' 
-                    : '3px solid rgba(139, 92, 246, 0.5)',
-                  background: isDarkMode ? '#0a0a0a' : 'rgba(230, 225, 240, 0.5)'
+                    ? '0 0 30px rgba(139, 92, 246, 0.4), 0 0 50px rgba(139, 92, 246, 0.2), inset 0 0 30px rgba(139, 92, 246, 0.15)'
+                    : '0 0 25px rgba(139, 92, 246, 0.25), 0 0 40px rgba(139, 92, 246, 0.15), inset 0 0 20px rgba(139, 92, 246, 0.1)',
+                  background: isDarkMode
+                    ? 'radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, rgba(30, 30, 50, 0.9) 70%)'
+                    : 'radial-gradient(circle, rgba(200, 195, 220, 0.8) 0%, rgba(220, 215, 235, 0.95) 70%)'
                 }}
               >
-                <svg className="w-full h-full" viewBox="0 0 200 200">
-                  <defs>
-                    {participantList.map((_, i) => {
-                      const neonColors = [
-                        { start: '#8B5CF6', end: '#6D28D9' },
-                        { start: '#EC4899', end: '#BE185D' },
-                        { start: '#06B6D4', end: '#0891B2' },
-                        { start: '#F59E0B', end: '#D97706' },
-                        { start: '#10B981', end: '#059669' },
-                        { start: '#EF4444', end: '#DC2626' },
-                        { start: '#3B82F6', end: '#2563EB' },
-                        { start: '#A855F7', end: '#7E22CE' }
-                      ];
-                      const color = neonColors[i % neonColors.length];
-                      return (
-                        <linearGradient key={`gradient-${i}`} id={`segment-${i}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" style={{ stopColor: color.start, stopOpacity: isDarkMode ? 1 : 0.85 }} />
-                          <stop offset="100%" style={{ stopColor: color.end, stopOpacity: isDarkMode ? 0.9 : 0.75 }} />
-                        </linearGradient>
-                      );
-                    })}
-                  </defs>
-                  
-                  {participantList.length > 0 && participantList.map((participant, i) => {
-                    const segmentCount = participantList.length;
-                    const angle = (360 / segmentCount) * i;
-                    const nextAngle = (360 / segmentCount) * (i + 1);
-                    const startRad = (angle - 90) * (Math.PI / 180);
-                    const endRad = (nextAngle - 90) * (Math.PI / 180);
-                    const x1 = 100 + 95 * Math.cos(startRad);
-                    const y1 = 100 + 95 * Math.sin(startRad);
-                    const x2 = 100 + 95 * Math.cos(endRad);
-                    const y2 = 100 + 95 * Math.sin(endRad);
-                    const largeArc = segmentCount <= 2 ? 1 : 0;
-                    
-                    const textAngle = angle + (360 / segmentCount) / 2;
-                    const textRad = (textAngle - 90) * (Math.PI / 180);
-                    const textX = 100 + 65 * Math.cos(textRad);
-                    const textY = 100 + 65 * Math.sin(textRad);
-                    
-                    const displayName = participant.length > 12 ? participant.substring(0, 10) + '...' : participant;
-                    
-                    return (
-                      <g key={i}>
-                        <path
-                          d={`M 100 100 L ${x1} ${y1} A 95 95 0 ${largeArc} 1 ${x2} ${y2} Z`}
-                          fill={`url(#segment-${i})`}
-                          stroke={isDarkMode ? '#ffffff' : '#000000'}
-                          strokeWidth="0.5"
-                          style={{
-                            filter: isDarkMode 
-                              ? `drop-shadow(0 0 8px ${['#8B5CF6', '#EC4899', '#06B6D4', '#F59E0B', '#10B981', '#EF4444', '#3B82F6', '#A855F7'][i % 8]})`
-                              : 'drop-shadow(0 0 4px rgba(0, 0, 0, 0.2))'
-                          }}
-                        />
-                        <text
-                          x={textX}
-                          y={textY}
-                          fill={isDarkMode ? '#ffffff' : '#1a1a1a'}
-                          fontSize={segmentCount > 15 ? '4' : segmentCount > 10 ? '5' : '6'}
-                          fontWeight="bold"
-                          textAnchor="middle"
-                          dominantBaseline="middle"
-                          transform={`rotate(${textAngle}, ${textX}, ${textY})`}
-                          style={{
-                            textShadow: isDarkMode 
-                              ? '0 0 8px rgba(255, 255, 255, 0.8), 0 0 12px rgba(255, 255, 255, 0.5)'
-                              : '0 0 4px rgba(0, 0, 0, 0.3)',
-                            pointerEvents: 'none'
-                          }}
-                        >
-                          {displayName}
-                        </text>
-                      </g>
-                    );
-                  })}
-                </svg>
-                
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full flex items-center justify-center"
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full border-4 border-secondary/50 flex items-center justify-center"
                      style={{
                        boxShadow: isDarkMode
-                         ? '0 0 30px #EC4899, 0 0 50px #8B5CF6, inset 0 0 20px rgba(139, 92, 246, 0.5)'
-                         : '0 0 20px rgba(236, 72, 153, 0.6), inset 0 0 15px rgba(139, 92, 246, 0.3)',
+                         ? '0 0 15px rgba(94, 147, 177, 0.5)'
+                         : '0 0 12px rgba(139, 92, 246, 0.3)',
                        background: isDarkMode
-                         ? 'linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%)'
-                         : 'linear-gradient(135deg, rgba(167, 139, 250, 0.95) 0%, rgba(244, 114, 182, 0.95) 100%)',
-                       border: isDarkMode ? '3px solid #06B6D4' : '3px solid rgba(6, 182, 212, 0.6)'
+                         ? 'radial-gradient(circle, rgba(94, 147, 177, 0.25) 0%, rgba(30, 30, 50, 0.95) 70%)'
+                         : 'radial-gradient(circle, rgba(210, 205, 230, 0.9) 0%, rgba(225, 220, 240, 0.95) 70%)'
                      }}>
-                  <Icon name="Zap" size={36} className="text-white drop-shadow-lg animate-pulse" />
+                  <Icon name="Sparkles" size={32} className="text-secondary" />
                 </div>
               </div>
 
-              <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[28px] border-l-transparent border-r-[28px] border-r-transparent border-t-[56px] z-10"
-                   style={{ 
-                     borderTopColor: isDarkMode ? '#EC4899' : 'rgba(236, 72, 153, 0.8)',
-                     filter: isDarkMode 
-                       ? 'drop-shadow(0 0 15px #EC4899) drop-shadow(0 0 25px #8B5CF6)' 
-                       : 'drop-shadow(0 0 12px rgba(236, 72, 153, 0.6))'
-                   }} />
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[20px] border-l-transparent border-r-[20px] border-r-transparent border-t-[40px] border-t-primary"
+                   style={{ filter: 'drop-shadow(0 0 8px rgba(139, 92, 246, 0.5))' }} />
             </div>
 
             <Button
