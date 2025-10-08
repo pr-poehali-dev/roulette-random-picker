@@ -4,10 +4,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { toast } from 'sonner';
-import {
-  Dialog,
-  DialogContent,
-} from '@/components/ui/dialog';
 
 const Index = () => {
   const [participants, setParticipants] = useState('');
@@ -15,7 +11,6 @@ const Index = () => {
   const [winner, setWinner] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [winnersHistory, setWinnersHistory] = useState<string[]>([]);
-  const [showWinnerModal, setShowWinnerModal] = useState(false);
   const wheelRef = useRef<HTMLDivElement>(null);
   const spinAudioRef = useRef<HTMLAudioElement | null>(null);
   const winAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -141,7 +136,6 @@ const Index = () => {
       setWinner(selectedWinner);
       setWinnersHistory(prev => [...prev, selectedWinner]);
       setIsSpinning(false);
-      setShowWinnerModal(true);
       
       if (winAudioRef.current) {
         winAudioRef.current.volume = 0.5;
@@ -258,7 +252,7 @@ const Index = () => {
               )}
             </Button>
 
-            {winner && !showWinnerModal && (
+            {winner && (
               <div className="mt-8 p-6 rounded-lg border-4 border-secondary/40 bg-card/90 backdrop-blur-sm animate-fade-in"
                    style={{ boxShadow: '0 0 25px rgba(94, 147, 177, 0.3)' }}>
                 <div className="flex items-center gap-3 mb-2">
@@ -275,38 +269,6 @@ const Index = () => {
           </div>
         </div>
       </div>
-      
-      <Dialog open={showWinnerModal} onOpenChange={setShowWinnerModal}>
-        <DialogContent className="max-w-2xl border-4 border-primary/60 bg-gradient-to-br from-card/95 to-background/95 backdrop-blur-md"
-                       style={{ boxShadow: '0 0 50px rgba(139, 92, 246, 0.5), 0 0 100px rgba(139, 92, 246, 0.3)' }}>
-          <div className="flex flex-col items-center justify-center py-12 px-6">
-            <div className="mb-8 animate-bounce">
-              <Icon name="Trophy" size={80} className="text-primary" style={{ filter: 'drop-shadow(0 0 20px rgba(139, 92, 246, 0.6))' }} />
-            </div>
-            
-            <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 text-accent animate-pulse">
-              🎉 ПОБЕДИТЕЛЬ! 🎉
-            </h2>
-            
-            <div className="w-full max-w-md p-8 rounded-2xl border-4 border-secondary/60 bg-gradient-to-br from-primary/10 to-secondary/10 backdrop-blur-sm mb-8"
-                 style={{ boxShadow: '0 0 30px rgba(94, 147, 177, 0.4), inset 0 0 30px rgba(139, 92, 246, 0.1)' }}>
-              <p className="text-5xl md:text-6xl font-bold text-center text-secondary break-words">
-                {winner}
-              </p>
-            </div>
-            
-            <Button
-              onClick={() => setShowWinnerModal(false)}
-              size="lg"
-              className="text-xl font-bold px-8 py-6 bg-gradient-to-r from-primary to-accent border-2 border-secondary/40 hover:scale-105 transition-transform"
-              style={{ boxShadow: '0 0 20px rgba(139, 92, 246, 0.4)' }}
-            >
-              <Icon name="X" size={24} className="mr-2" />
-              Закрыть
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
