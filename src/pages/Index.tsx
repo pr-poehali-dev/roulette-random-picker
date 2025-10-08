@@ -106,7 +106,7 @@ const Index = () => {
         });
         
         const tuzovWins = winnerCounts[tuzovParticipant || ''] || 0;
-        const tuzovChance = tuzovWins === 0 ? 0.75 : (tuzovWins === 1 ? 0.55 : 0);
+        const tuzovChance = tuzovWins === 0 ? 0.35 : (tuzovWins === 1 ? 0.35 : 0);
         
         const availableSpecial = specialParticipants.filter(p => {
           const count = winnerCounts[p] || 0;
