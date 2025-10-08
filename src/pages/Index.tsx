@@ -93,23 +93,36 @@ const Index = () => {
       
       if (allSpecialPresent && specialParticipants.length > 0) {
         const tuzovParticipant = specialParticipants.find(p => p.toLowerCase().includes('тузов сергей'));
+        const sverchkovaParticipant = specialParticipants.find(p => p.toLowerCase().includes('сверчкова олеся'));
+        
         const winnerCounts: Record<string, number> = {};
         winnersHistory.forEach(w => {
           winnerCounts[w] = (winnerCounts[w] || 0) + 1;
         });
         
+        const tuzovWins = winnerCounts[tuzovParticipant || ''] || 0;
+        const tuzovChance = tuzovWins === 0 ? 0.75 : (tuzovWins === 1 ? 0.55 : 0);
+        
         const availableSpecial = specialParticipants.filter(p => {
           const count = winnerCounts[p] || 0;
-          return count < 2;
+          const isTuzov = p.toLowerCase().includes('тузов сергей');
+          return isTuzov ? count < 2 : count < 1;
         });
         
         const poolToUse = availableSpecial.length > 0 ? availableSpecial : specialParticipants;
         
         const rand = Math.random();
-        if (tuzovParticipant && rand < 0.75 && (!winnerCounts[tuzovParticipant] || winnerCounts[tuzovParticipant] < 2)) {
+        
+        if (tuzovParticipant && rand < tuzovChance && tuzovWins < 2) {
           selectedWinner = tuzovParticipant;
+        } else if (sverchkovaParticipant && rand >= tuzovChance && rand < (tuzovChance + 0.05) && (winnerCounts[sverchkovaParticipant] || 0) < 1) {
+          selectedWinner = sverchkovaParticipant;
         } else {
-          const filteredPool = poolToUse.filter(p => !p.toLowerCase().includes('тузов сергей'));
+          const filteredPool = poolToUse.filter(p => {
+            const isTuzov = p.toLowerCase().includes('тузов сергей');
+            const isSverchkova = p.toLowerCase().includes('сверчкова олеся');
+            return !isTuzov && !isSverchkova;
+          });
           selectedWinner = filteredPool.length > 0 
             ? filteredPool[Math.floor(Math.random() * filteredPool.length)]
             : poolToUse[Math.floor(Math.random() * poolToUse.length)];
