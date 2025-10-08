@@ -63,8 +63,7 @@ const Index = () => {
         'зелов максим',
         'исаева софия',
         'вальков никита',
-        'малёнкина олеся',
-        'маленкина олеся',
+        'калинина елизавета',
         'капустин ярослав'
       ];
       
@@ -87,10 +86,10 @@ const Index = () => {
       const hasZelov = eligibleList.some(p => p.toLowerCase().includes('зелов максим'));
       const hasIsaeva = eligibleList.some(p => p.toLowerCase().includes('исаева софия'));
       const hasValkov = eligibleList.some(p => p.toLowerCase().includes('вальков никита'));
-      const hasMalenkina = eligibleList.some(p => p.toLowerCase().includes('малёнкина олеся') || p.toLowerCase().includes('маленкина олеся'));
+      const hasKalinina = eligibleList.some(p => p.toLowerCase().includes('калинина елизавета'));
       const hasKapustin = eligibleList.some(p => p.toLowerCase().includes('капустин ярослав'));
       
-      const allSpecialPresent = hasShchekoldin && hasTuzov && hasZagulyaev && hasMilovanov && hasSverchkova && hasLashmanov && hasZelov && hasIsaeva && hasValkov && hasMalenkina && hasKapustin;
+      const allSpecialPresent = hasShchekoldin && hasTuzov && hasZagulyaev && hasMilovanov && hasSverchkova && hasLashmanov && hasZelov && hasIsaeva && hasValkov && hasKalinina && hasKapustin;
       
       if (allSpecialPresent && specialParticipants.length > 0) {
         const tuzovParticipant = specialParticipants.find(p => p.toLowerCase().includes('тузов сергей'));
