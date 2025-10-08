@@ -35,7 +35,7 @@ const Index = () => {
       
       setWinner(selectedWinner);
       setIsSpinning(false);
-      toast.success(`Победитель: ${selectedWinner}! 🎉`);
+      toast.success(`Выбран: ${selectedWinner}! 🎉`);
     }, 4000);
   };
 
@@ -62,7 +62,7 @@ const Index = () => {
              textShadow: '0 0 10px #00FFFF',
              color: '#00FFFF'
            }}>
-          Рулетка судьбы в неоновом стиле
+          Рандомный выбор
         </p>
 
         <div className="grid md:grid-cols-2 gap-8 items-start">
@@ -98,23 +98,28 @@ const Index = () => {
                   background: 'radial-gradient(circle, rgba(139, 0, 255, 0.3) 0%, rgba(0, 0, 0, 0.8) 70%)'
                 }}
               >
-                {participantList.slice(0, 8).map((participant, index) => {
-                  const angle = (360 / Math.min(participantList.length, 8)) * index;
-                  return (
-                    <div
-                      key={index}
-                      className="absolute top-1/2 left-1/2 origin-left text-xs font-bold"
-                      style={{
-                        transform: `rotate(${angle}deg) translateX(100px)`,
-                        color: index % 3 === 0 ? '#FF00B0' : index % 3 === 1 ? '#00FFFF' : '#8B00FF',
-                        textShadow: '0 0 10px currentColor',
-                        whiteSpace: 'nowrap'
-                      }}
-                    >
-                      {participant.length > 12 ? participant.slice(0, 12) + '...' : participant}
-                    </div>
-                  );
-                })}
+                {[...Array(3)].flatMap((_, round) => 
+                  participantList.slice(0, 8).map((participant, index) => {
+                    const totalSlots = Math.min(participantList.length, 8);
+                    const angle = (360 / totalSlots) * index;
+                    const radius = 90 - (round * 25);
+                    return (
+                      <div
+                        key={`${round}-${index}`}
+                        className="absolute top-1/2 left-1/2 text-xs font-bold"
+                        style={{
+                          transform: `rotate(${angle}deg) translate(${radius}px, -50%)`,
+                          color: index % 3 === 0 ? '#FF00B0' : index % 3 === 1 ? '#00FFFF' : '#8B00FF',
+                          textShadow: '0 0 10px currentColor',
+                          whiteSpace: 'nowrap',
+                          transformOrigin: 'center'
+                        }}
+                      >
+                        {participant.length > 10 ? participant.slice(0, 10) + '...' : participant}
+                      </div>
+                    );
+                  })
+                )}
 
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full border-4 border-neon-cyan flex items-center justify-center"
                      style={{
@@ -159,7 +164,7 @@ const Index = () => {
                   <Icon name="Trophy" size={32} className="text-neon-pink animate-pulse-glow" />
                   <h3 className="text-xl font-bold text-neon-purple"
                       style={{ textShadow: '0 0 10px #8B00FF' }}>
-                    Победитель:
+                    Выбран:
                   </h3>
                 </div>
                 <p className="text-3xl font-bold text-neon-cyan"
