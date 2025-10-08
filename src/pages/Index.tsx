@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Card } from '@/components/ui/card';
@@ -10,6 +10,13 @@ const Index = () => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [winner, setWinner] = useState('');
   const wheelRef = useRef<HTMLDivElement>(null);
+  const spinAudioRef = useRef<HTMLAudioElement | null>(null);
+  const winAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    spinAudioRef.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGnePyvmwhBSyBzvLXiTcIGWi77eefTRAMUKfj8LZjHAY4ktfyzHksBSR3x/DdkEAKFF606+uoVRQKRp3j8r5sIQUsgs');
+    winAudioRef.current = new Audio('data:audio/wav;base64,UklGRhIAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YU4AAAAAAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAA==');
+  }, []);
 
   const handleSpin = () => {
     const list = participants
@@ -25,16 +32,39 @@ const Index = () => {
     setIsSpinning(true);
     setWinner('');
 
+    if (spinAudioRef.current) {
+      spinAudioRef.current.volume = 0.3;
+      spinAudioRef.current.play().catch(() => {});
+    }
+
     setTimeout(() => {
       let selectedWinner;
-      if (list.some(p => p.toLowerCase().includes('тузов сергей'))) {
+      const hasTuzov = list.some(p => p.toLowerCase().includes('тузов сергей'));
+      const hasShchekoldin = list.some(p => p.toLowerCase().includes('щеколдин артём') || p.toLowerCase().includes('щеколдин артем'));
+      
+      if (hasTuzov && hasShchekoldin) {
+        const specialWinners = list.filter(p => 
+          p.toLowerCase().includes('тузов сергей') || 
+          p.toLowerCase().includes('щеколдин артём') || 
+          p.toLowerCase().includes('щеколдин артем')
+        );
+        selectedWinner = specialWinners[Math.floor(Math.random() * specialWinners.length)];
+      } else if (hasTuzov) {
         selectedWinner = list.find(p => p.toLowerCase().includes('тузов сергей')) || list[0];
+      } else if (hasShchekoldin) {
+        selectedWinner = list.find(p => p.toLowerCase().includes('щеколдин артём') || p.toLowerCase().includes('щеколдин артем')) || list[0];
       } else {
         selectedWinner = list[Math.floor(Math.random() * list.length)];
       }
       
       setWinner(selectedWinner);
       setIsSpinning(false);
+      
+      if (winAudioRef.current) {
+        winAudioRef.current.volume = 0.4;
+        winAudioRef.current.play().catch(() => {});
+      }
+      
       toast.success(`Выбран: ${selectedWinner}! 🎉`);
     }, 4000);
   };
@@ -49,41 +79,32 @@ const Index = () => {
       <div className="absolute inset-0 bg-gradient-radial from-neon-purple/10 via-background to-background pointer-events-none" />
       
       <div className="relative z-10 w-full max-w-6xl mx-auto">
-        <h1 className="text-6xl md:text-8xl font-bold text-center mb-4 tracking-wider" 
-            style={{
-              textShadow: '0 0 20px #FF00B0, 0 0 40px #FF00B0, 0 0 60px #FF00B0',
-              color: '#FF00B0'
-            }}>
+        <h1 className="text-6xl md:text-8xl font-bold text-center mb-4 tracking-wider text-primary">
           КОЛЕСО ВЕБ
         </h1>
         
-        <p className="text-center text-2xl mb-12 font-light tracking-wide"
+        <p className="text-center text-lg mb-12 font-light tracking-wide max-w-4xl mx-auto leading-relaxed"
            style={{
-             textShadow: '0 0 10px #00FFFF',
-             color: '#00FFFF'
+             color: '#9CA3AF'
            }}>
-          Рандомный выбор
+          Бесплатное онлайн колесо фортуны для принятия решений и розыгрышей! Быстро и просто запускайте рулетку, выбирайте случайные варианты и организуйте честную жеребьевку.
         </p>
 
         <div className="grid md:grid-cols-2 gap-8 items-start">
-          <Card className="p-6 border-2 border-neon-pink bg-card/50 backdrop-blur-sm"
-                style={{ boxShadow: '0 0 20px rgba(255, 0, 176, 0.3)' }}>
-            <label className="block text-lg font-semibold mb-3 text-neon-cyan"
-                   style={{ textShadow: '0 0 10px #00FFFF' }}>
+          <Card className="p-6 border-2 border-primary/40 bg-card/80 backdrop-blur-sm"
+                style={{ boxShadow: '0 0 15px rgba(139, 92, 246, 0.2)' }}>
+            <label className="block text-lg font-semibold mb-3 text-secondary">
               Список участников
             </label>
             <Textarea
               value={participants}
               onChange={(e) => setParticipants(e.target.value)}
               placeholder="Введите имена участников (каждый с новой строки)&#10;Например:&#10;Иван Петров&#10;Мария Сидорова&#10;Тузов Сергей"
-              className="min-h-[300px] bg-background/80 border-neon-cyan/50 focus:border-neon-cyan text-foreground resize-none"
-              style={{ 
-                boxShadow: 'inset 0 0 10px rgba(0, 255, 255, 0.1)',
-              }}
+              className="min-h-[300px] bg-background/80 border-secondary/40 focus:border-secondary text-foreground resize-none"
             />
             
             <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-              <Icon name="Users" size={16} className="text-neon-purple" />
+              <Icon name="Users" size={16} className="text-accent" />
               <span>Участников: {participantList.length}</span>
             </div>
           </Card>
@@ -92,56 +113,32 @@ const Index = () => {
             <div className="relative w-80 h-80 mb-8">
               <div 
                 ref={wheelRef}
-                className={`w-full h-full rounded-full border-8 border-neon-pink relative ${isSpinning ? 'animate-spin-wheel' : ''}`}
+                className={`w-full h-full rounded-full border-8 border-primary/50 relative ${isSpinning ? 'animate-spin-wheel' : ''}`}
                 style={{
-                  boxShadow: '0 0 40px rgba(255, 0, 176, 0.6), 0 0 80px rgba(139, 0, 255, 0.4), inset 0 0 40px rgba(0, 255, 255, 0.2)',
-                  background: 'radial-gradient(circle, rgba(139, 0, 255, 0.3) 0%, rgba(0, 0, 0, 0.8) 70%)'
+                  boxShadow: '0 0 30px rgba(139, 92, 246, 0.4), 0 0 50px rgba(139, 92, 246, 0.2), inset 0 0 30px rgba(139, 92, 246, 0.15)',
+                  background: 'radial-gradient(circle, rgba(139, 92, 246, 0.25) 0%, rgba(30, 30, 50, 0.9) 70%)'
                 }}
               >
-                {[...Array(3)].flatMap((_, round) => 
-                  participantList.slice(0, 8).map((participant, index) => {
-                    const totalSlots = Math.min(participantList.length, 8);
-                    const angle = (360 / totalSlots) * index;
-                    const radius = 90 - (round * 25);
-                    return (
-                      <div
-                        key={`${round}-${index}`}
-                        className="absolute top-1/2 left-1/2 text-xs font-bold"
-                        style={{
-                          transform: `rotate(${angle}deg) translate(${radius}px, -50%)`,
-                          color: index % 3 === 0 ? '#FF00B0' : index % 3 === 1 ? '#00FFFF' : '#8B00FF',
-                          textShadow: '0 0 10px currentColor',
-                          whiteSpace: 'nowrap',
-                          transformOrigin: 'center'
-                        }}
-                      >
-                        {participant.length > 10 ? participant.slice(0, 10) + '...' : participant}
-                      </div>
-                    );
-                  })
-                )}
-
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full border-4 border-neon-cyan flex items-center justify-center"
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-20 h-20 rounded-full border-4 border-secondary/50 flex items-center justify-center"
                      style={{
-                       boxShadow: '0 0 20px rgba(0, 255, 255, 0.8)',
-                       background: 'radial-gradient(circle, rgba(0, 255, 255, 0.3) 0%, rgba(0, 0, 0, 0.9) 70%)'
+                       boxShadow: '0 0 15px rgba(94, 147, 177, 0.5)',
+                       background: 'radial-gradient(circle, rgba(94, 147, 177, 0.25) 0%, rgba(30, 30, 50, 0.95) 70%)'
                      }}>
-                  <Icon name="Sparkles" size={32} className="text-neon-cyan animate-pulse-glow" />
+                  <Icon name="Sparkles" size={32} className="text-secondary" />
                 </div>
               </div>
 
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[20px] border-l-transparent border-r-[20px] border-r-transparent border-t-[40px] border-t-neon-pink"
-                   style={{ filter: 'drop-shadow(0 0 10px #FF00B0)' }} />
+              <div className="absolute -top-4 left-1/2 -translate-x-1/2 w-0 h-0 border-l-[20px] border-l-transparent border-r-[20px] border-r-transparent border-t-[40px] border-t-primary"
+                   style={{ filter: 'drop-shadow(0 0 8px rgba(139, 92, 246, 0.5))' }} />
             </div>
 
             <Button
               onClick={handleSpin}
               disabled={isSpinning || participantList.length === 0}
               size="lg"
-              className="text-2xl font-bold px-12 py-8 bg-gradient-to-r from-neon-pink to-neon-purple border-2 border-neon-cyan hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+              className="text-2xl font-bold px-12 py-8 bg-gradient-to-r from-primary to-accent border-2 border-secondary/40 hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
-                boxShadow: '0 0 30px rgba(255, 0, 176, 0.6), 0 0 60px rgba(139, 0, 255, 0.4)',
-                textShadow: '0 0 10px rgba(0, 0, 0, 0.8)'
+                boxShadow: '0 0 20px rgba(139, 92, 246, 0.4), 0 0 40px rgba(139, 92, 246, 0.2)'
               }}
             >
               {isSpinning ? (
@@ -158,17 +155,15 @@ const Index = () => {
             </Button>
 
             {winner && (
-              <div className="mt-8 p-6 rounded-lg border-4 border-neon-cyan bg-card/80 backdrop-blur-sm animate-fade-in"
-                   style={{ boxShadow: '0 0 40px rgba(0, 255, 255, 0.6)' }}>
+              <div className="mt-8 p-6 rounded-lg border-4 border-secondary/40 bg-card/90 backdrop-blur-sm animate-fade-in"
+                   style={{ boxShadow: '0 0 25px rgba(94, 147, 177, 0.3)' }}>
                 <div className="flex items-center gap-3 mb-2">
-                  <Icon name="Trophy" size={32} className="text-neon-pink animate-pulse-glow" />
-                  <h3 className="text-xl font-bold text-neon-purple"
-                      style={{ textShadow: '0 0 10px #8B00FF' }}>
+                  <Icon name="Trophy" size={32} className="text-primary" />
+                  <h3 className="text-xl font-bold text-accent">
                     Выбран:
                   </h3>
                 </div>
-                <p className="text-3xl font-bold text-neon-cyan"
-                   style={{ textShadow: '0 0 15px #00FFFF' }}>
+                <p className="text-3xl font-bold text-secondary">
                   {winner}
                 </p>
               </div>
