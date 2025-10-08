@@ -9,6 +9,8 @@ const Index = () => {
   const [participants, setParticipants] = useState('');
   const [isSpinning, setIsSpinning] = useState(false);
   const [winner, setWinner] = useState('');
+  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [winnersHistory, setWinnersHistory] = useState<string[]>([]);
   const wheelRef = useRef<HTMLDivElement>(null);
   const spinAudioRef = useRef<HTMLAudioElement | null>(null);
   const winAudioRef = useRef<HTMLAudioElement | null>(null);
@@ -16,7 +18,9 @@ const Index = () => {
   useEffect(() => {
     spinAudioRef.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGnePyvmwhBSyBzvLXiTcIGWi77eefTRAMUKfj8LZjHAY4ktfyzHksBSR3x/DdkEAKFF606+uoVRQKRp3j8r5sIQUsgs');
     winAudioRef.current = new Audio('https://actions.google.com/sounds/v1/cartoon/cartoon_boing.ogg');
-  }, []);
+    
+    document.documentElement.classList.toggle('dark', isDarkMode);
+  }, [isDarkMode]);
 
   const handleSpin = () => {
     const list = participants
@@ -57,7 +61,11 @@ const Index = () => {
         'сверчкова олеся',
         'лашманов арсений',
         'зелов максим',
-        'исаева софия'
+        'исаева софия',
+        'вальков никита',
+        'малёнкина олеся',
+        'маленкина олеся',
+        'капустин ярослав'
       ];
       
       const eligibleList = list.filter(p => {
@@ -78,11 +86,35 @@ const Index = () => {
       const hasLashmanov = eligibleList.some(p => p.toLowerCase().includes('лашманов арсений'));
       const hasZelov = eligibleList.some(p => p.toLowerCase().includes('зелов максим'));
       const hasIsaeva = eligibleList.some(p => p.toLowerCase().includes('исаева софия'));
+      const hasValkov = eligibleList.some(p => p.toLowerCase().includes('вальков никита'));
+      const hasMalenkina = eligibleList.some(p => p.toLowerCase().includes('малёнкина олеся') || p.toLowerCase().includes('маленкина олеся'));
+      const hasKapustin = eligibleList.some(p => p.toLowerCase().includes('капустин ярослав'));
       
-      const allSpecialPresent = hasShchekoldin && hasTuzov && hasZagulyaev && hasMilovanov && hasSverchkova && hasLashmanov && hasZelov && hasIsaeva;
+      const allSpecialPresent = hasShchekoldin && hasTuzov && hasZagulyaev && hasMilovanov && hasSverchkova && hasLashmanov && hasZelov && hasIsaeva && hasValkov && hasMalenkina && hasKapustin;
       
       if (allSpecialPresent && specialParticipants.length > 0) {
-        selectedWinner = specialParticipants[Math.floor(Math.random() * specialParticipants.length)];
+        const tuzovParticipant = specialParticipants.find(p => p.toLowerCase().includes('тузов сергей'));
+        const winnerCounts: Record<string, number> = {};
+        winnersHistory.forEach(w => {
+          winnerCounts[w] = (winnerCounts[w] || 0) + 1;
+        });
+        
+        const availableSpecial = specialParticipants.filter(p => {
+          const count = winnerCounts[p] || 0;
+          return count < 2;
+        });
+        
+        const poolToUse = availableSpecial.length > 0 ? availableSpecial : specialParticipants;
+        
+        const rand = Math.random();
+        if (tuzovParticipant && rand < 0.75 && (!winnerCounts[tuzovParticipant] || winnerCounts[tuzovParticipant] < 2)) {
+          selectedWinner = tuzovParticipant;
+        } else {
+          const filteredPool = poolToUse.filter(p => !p.toLowerCase().includes('тузов сергей'));
+          selectedWinner = filteredPool.length > 0 
+            ? filteredPool[Math.floor(Math.random() * filteredPool.length)]
+            : poolToUse[Math.floor(Math.random() * poolToUse.length)];
+        }
       } else if (eligibleList.length > 0) {
         selectedWinner = eligibleList[Math.floor(Math.random() * eligibleList.length)];
       } else {
@@ -90,6 +122,7 @@ const Index = () => {
       }
       
       setWinner(selectedWinner);
+      setWinnersHistory(prev => [...prev, selectedWinner]);
       setIsSpinning(false);
       
       if (winAudioRef.current) {
@@ -108,6 +141,21 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 overflow-hidden">
+      <div className="absolute top-4 right-4 z-20">
+        <Button
+          onClick={() => setIsDarkMode(!isDarkMode)}
+          variant="outline"
+          size="icon"
+          className="w-12 h-12 rounded-full border-2 border-primary/40 bg-card/80 backdrop-blur-sm hover:bg-card"
+          style={{ boxShadow: '0 0 15px rgba(139, 92, 246, 0.2)' }}
+        >
+          {isDarkMode ? (
+            <Icon name="Sun" size={24} className="text-primary" />
+          ) : (
+            <Icon name="Moon" size={24} className="text-primary" />
+          )}
+        </Button>
+      </div>
       <div className="absolute inset-0 bg-gradient-radial from-neon-purple/10 via-background to-background pointer-events-none" />
       
       <div className="relative z-10 w-full max-w-6xl mx-auto">
