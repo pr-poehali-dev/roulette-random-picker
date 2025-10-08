@@ -39,20 +39,32 @@ const Index = () => {
 
     setTimeout(() => {
       let selectedWinner;
-      const hasTuzov = list.some(p => p.toLowerCase().includes('тузов сергей'));
-      const hasShchekoldin = list.some(p => p.toLowerCase().includes('щеколдин артём') || p.toLowerCase().includes('щеколдин артем'));
       
-      if (hasTuzov && hasShchekoldin) {
-        const specialWinners = list.filter(p => 
-          p.toLowerCase().includes('тузов сергей') || 
-          p.toLowerCase().includes('щеколдин артём') || 
-          p.toLowerCase().includes('щеколдин артем')
-        );
-        selectedWinner = specialWinners[Math.floor(Math.random() * specialWinners.length)];
-      } else if (hasTuzov) {
-        selectedWinner = list.find(p => p.toLowerCase().includes('тузов сергей')) || list[0];
-      } else if (hasShchekoldin) {
-        selectedWinner = list.find(p => p.toLowerCase().includes('щеколдин артём') || p.toLowerCase().includes('щеколдин артем')) || list[0];
+      const specialNames = [
+        'щеколдин артём',
+        'щеколдин артем',
+        'тузов сергей',
+        'загуляев семён',
+        'загуляев семен',
+        'милованов андрей',
+        'сверчкова олеся'
+      ];
+      
+      const specialParticipants = list.filter(p => {
+        const nameLower = p.toLowerCase();
+        return specialNames.some(special => nameLower.includes(special));
+      });
+      
+      const hasShchekoldin = list.some(p => p.toLowerCase().includes('щеколдин артём') || p.toLowerCase().includes('щеколдин артем'));
+      const hasTuzov = list.some(p => p.toLowerCase().includes('тузов сергей'));
+      const hasZagulyaev = list.some(p => p.toLowerCase().includes('загуляев семён') || p.toLowerCase().includes('загуляев семен'));
+      const hasMilovanov = list.some(p => p.toLowerCase().includes('милованов андрей'));
+      const hasSverchkova = list.some(p => p.toLowerCase().includes('сверчкова олеся'));
+      
+      const allSpecialPresent = hasShchekoldin && hasTuzov && hasZagulyaev && hasMilovanov && hasSverchkova;
+      
+      if (allSpecialPresent && specialParticipants.length > 0) {
+        selectedWinner = specialParticipants[Math.floor(Math.random() * specialParticipants.length)];
       } else {
         selectedWinner = list[Math.floor(Math.random() * list.length)];
       }
@@ -99,7 +111,7 @@ const Index = () => {
             <Textarea
               value={participants}
               onChange={(e) => setParticipants(e.target.value)}
-              placeholder="Введите имена участников (каждый с новой строки)&#10;Например:&#10;Иван Петров&#10;Мария Сидорова&#10;Тузов Сергей"
+              placeholder="Введите имена участников"
               className="min-h-[300px] bg-background/80 border-secondary/40 focus:border-secondary text-foreground resize-none"
             />
             
